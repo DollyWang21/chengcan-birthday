@@ -1,0 +1,657 @@
+/* ==========================================================================
+   主题色板 + 视觉层 v2  —— 只改这个文件就够了
+   --------------------------------------------------------------------------
+   这个文件在 style.css 之后加载，所以这里的值会覆盖前面的默认值。
+   布局、定位、层级、显隐相关的规则一律没有动（见交接文档的“红线清单”）。
+   v2 只做四件事：统一光源、做实物感（接触阴影）、压住放大层背景、修小字对比度。
+   ========================================================================== */
+
+:root {
+  /* 纸张色：卡片、备注纸、弹层的底色（比纯白暖一档，久看不刺眼） */
+  --paper: #FFF6E6;
+
+  /* 纸面高光：相纸、卡面上沿 */
+  --paper-hi: #FFFCF5;
+
+  /* 主文字色：标题、正文（加深，正文对比 8.4 → 9.6） */
+  --ink: #493528;
+
+  /* 次要文字色：说明、提示（加深，正文对比 4.24 → 5.1） */
+  --ink-2: #7A6151;
+
+  /* 辅助小字：日期、区块标签（11px 也要看得清） */
+  --ink-3: #8A7060;
+
+  /* 暖光色：层标题、光晕、边框（提亮一点点） */
+  --glow: #FCEED4;
+
+  /* 烛光色：功德数字、火苗 */
+  --candle: #FFB157;
+
+  /* 虚线 / 分割线 */
+  --line: #E4D2B8;
+
+  /* 纸边（卡片描边用，别用纯黑） */
+  --paper-edge: rgba(206, 175, 133, 0.42);
+}
+
+/* --------------------------------------------------------------------------
+   0. 整页底色：比原来的 #15100D 再深一档，让暖色物件更“亮”出来
+   -------------------------------------------------------------------------- */
+html,
+body {
+  background: #100B09;
+}
+
+/* --------------------------------------------------------------------------
+   1. 房间：给屋子一个真实光源（月光从窗，暖光从桌面往上）
+   -------------------------------------------------------------------------- */
+.room::before {
+  background:
+    radial-gradient(140% 62% at 50% 4%, #5B463B 0%, #362A22 44%, #1B1511 100%);
+}
+
+.room::after {
+  background:
+    /* 窗下的冷月光，落在墙面与桌面交界 */
+    radial-gradient(58% 34% at 50% 34%, rgba(214, 230, 255, 0.10), rgba(214, 230, 255, 0) 72%),
+    /* 四角暗角，把视线收进中间 */
+    radial-gradient(120% 70% at 50% 106%, rgba(0, 0, 0, 0.34), transparent 62%),
+    /* 桌面反射上来的暖光 */
+    radial-gradient(70% 30% at 50% 74%, rgba(255, 198, 138, 0.14), transparent 76%);
+}
+
+.beam {
+  background: linear-gradient(180deg, rgba(214, 230, 255, 0.10), rgba(255, 214, 150, 0.09) 46%, rgba(246, 231, 200, 0) 86%);
+  filter: blur(14px);
+}
+
+.lampglow {
+  background: radial-gradient(closest-side, rgba(255, 190, 120, 0.30), rgba(255, 190, 120, 0) 76%);
+}
+
+.wall-stars {
+  /* 提亮星点（它的闪烁动画在 style.css 里，这里只加滤镜，不碰 opacity） */
+  filter: brightness(1.55) saturate(1.15);
+}
+
+/* --------------------------------------------------------------------------
+   2. 桌面：从“等距塑料条板”改成“有窗光的木桌”
+   -------------------------------------------------------------------------- */
+.desk {
+  background:
+    /* 顶部窗光的落点 */
+    radial-gradient(64% 40% at 50% 0%, rgba(255, 238, 202, 0.26), rgba(255, 238, 202, 0) 72%),
+    /* 细木纹（1px，比原来的 2px/30px 密得多） */
+    repeating-linear-gradient(93deg, rgba(38, 20, 10, 0.075) 0 1px, transparent 1px 9px),
+    /* 木纹的宽向色差，破掉机械感 */
+    repeating-linear-gradient(87deg, rgba(255, 222, 180, 0.045) 0 2px, transparent 2px 23px),
+    /* 横向年轮，让“竖条纹”不再像布 */
+    repeating-linear-gradient(178deg, rgba(255, 226, 186, 0.030) 0 1px, transparent 1px 41px),
+    /* 纵向明暗：桌面近处亮、远处暗 */
+    linear-gradient(180deg, #8B6244 0%, #6B4832 36%, #402C1D 100%);
+  box-shadow:
+    0 -18px 40px rgba(0, 0, 0, 0.55),
+    inset 0 6px 0 rgba(255, 214, 170, 0.30),
+    /* 桌沿内侧的一道接触暗，缓解人物被桌面切断的“嵌入感” */
+    inset 0 16px 26px rgba(40, 20, 8, 0.22),
+    inset 0 -70px 100px rgba(0, 0, 0, 0.34);
+}
+
+/* --------------------------------------------------------------------------
+   3. 实物感：近实远虚的双层暖影（原来是统一的纯黑柔影 → 像贴纸）
+   -------------------------------------------------------------------------- */
+.obj img.art,
+.obj .art img,
+.note-hit img {
+  filter:
+    drop-shadow(0 2px 3px rgba(38, 20, 10, 0.34))
+    drop-shadow(0 14px 22px rgba(24, 13, 6, 0.46));
+}
+
+.obj .art svg {
+  filter:
+    drop-shadow(0 2px 3px rgba(38, 20, 10, 0.34))
+    drop-shadow(0 14px 22px rgba(24, 13, 6, 0.46));
+}
+
+.mallet-mini {
+  filter: drop-shadow(0 2px 2px rgba(38, 20, 10, 0.30)) drop-shadow(0 6px 10px rgba(24, 13, 6, 0.42));
+}
+
+.pencil-hit {
+  filter: drop-shadow(0 2px 3px rgba(38, 20, 10, 0.34)) drop-shadow(0 8px 14px rgba(24, 13, 6, 0.42));
+}
+
+.cat-home {
+  filter: drop-shadow(0 2px 3px rgba(38, 20, 10, 0.32)) drop-shadow(0 12px 20px rgba(24, 13, 6, 0.46));
+}
+
+.yarn {
+  filter: drop-shadow(0 2px 3px rgba(38, 20, 10, 0.30)) drop-shadow(0 10px 16px rgba(24, 13, 6, 0.44));
+}
+
+.egg {
+  filter: drop-shadow(0 2px 3px rgba(38, 20, 10, 0.30)) drop-shadow(0 10px 16px rgba(24, 13, 6, 0.44));
+}
+
+.plane-btn {
+  filter: drop-shadow(0 2px 3px rgba(38, 20, 10, 0.30)) drop-shadow(0 10px 18px rgba(24, 13, 6, 0.50));
+}
+
+/* 人物：上身在桌沿之上，需要一层更大的环境影 + 一层贴桌的接触影 */
+.ch {
+  filter:
+    drop-shadow(0 3px 5px rgba(28, 14, 6, 0.32))
+    drop-shadow(0 20px 32px rgba(16, 9, 4, 0.42));
+}
+
+/* 大件插画（放大层蛋糕、人物、欢迎卡小人）：暖影，别用死黑 */
+.big {
+  filter: drop-shadow(0 22px 38px rgba(18, 9, 4, 0.52));
+}
+
+.act-ch {
+  filter: drop-shadow(0 3px 4px rgba(30, 15, 7, 0.30)) drop-shadow(0 16px 26px rgba(16, 9, 4, 0.44));
+}
+
+.w-ch {
+  filter: drop-shadow(0 3px 5px rgba(48, 28, 14, 0.18)) drop-shadow(0 10px 18px rgba(48, 28, 14, 0.14));
+}
+
+/* --------------------------------------------------------------------------
+   4. 物件标签：从 2.35:1 拉到 5.9:1
+   -------------------------------------------------------------------------- */
+.obj-name {
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  color: rgba(255, 244, 220, 0.95);
+  margin-top: 3px;
+  text-shadow:
+    0 1px 2px rgba(22, 11, 5, 0.85),
+    0 0 10px rgba(22, 11, 5, 0.45);
+}
+
+/* style.css 里 .obj-cake .obj-name 单独定了 11px，特异性更高，这里一并对齐 */
+.obj-cake .obj-name {
+  font-size: 11.5px;
+}
+
+/* --------------------------------------------------------------------------
+   5. 放大层：把背景压到底，标题和主角才有焦点
+   -------------------------------------------------------------------------- */
+.scrim {
+  background: rgba(10, 7, 5, 0.91);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.overlay {
+  background: rgba(9, 6, 4, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.tip {
+  font-size: 22px;
+  color: #FDF1D8;
+  text-shadow:
+    0 2px 10px rgba(8, 4, 2, 0.90),
+    0 1px 2px rgba(8, 4, 2, 0.95),
+    0 0 24px rgba(255, 190, 120, 0.30);
+}
+
+.sub {
+  font-size: 13.5px;
+  letter-spacing: 0.05em;
+  color: rgba(255, 240, 214, 0.82);
+  text-shadow: 0 1px 6px rgba(8, 4, 2, 0.90);
+}
+
+.merit {
+  font-size: 15.5px;
+  color: rgba(255, 240, 214, 0.86);
+  text-shadow: 0 1px 6px rgba(8, 4, 2, 0.90);
+}
+
+.merit b {
+  font-size: 28px;
+  color: #FFC183;
+  text-shadow: 0 0 14px rgba(255, 160, 70, 0.55);
+}
+
+/* 层内按钮：原来压在人物白衣上几乎看不见，提到半透明暖底 + 深字 */
+.mini {
+  border-color: rgba(252, 238, 212, 0.52);
+  background: rgba(252, 238, 212, 0.14);
+  color: #FCEED4;
+  border-radius: 999px;
+  font-size: 14.5px;
+}
+
+/* 纸飞机返回键：在深色墙面上给一点暖边，别让它像补丁 */
+.plane-btn img {
+  filter: saturate(0.86) brightness(0.86);
+}
+
+/* 窗户的夜蓝是冷色，单独往暖里拉一点点，和屋内灯光接上 */
+.window-art {
+  filter: sepia(0.10) saturate(0.90) brightness(1.04);
+}
+
+/* --------------------------------------------------------------------------
+   6. 卡片：从“UI 组件”变成“手帐纸”
+   -------------------------------------------------------------------------- */
+.w-card,
+.card {
+  background:
+    /* 上沿一道极轻的高光 */
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 42%),
+    /* 纸纹：横向 3px 的极低透明线 */
+    repeating-linear-gradient(0deg, rgba(186, 148, 100, 0.035) 0 1px, transparent 1px 3px),
+    var(--paper);
+  background-color: var(--paper);
+}
+
+.w-card {
+  border-radius: 18px;
+  box-shadow:
+    0 26px 60px rgba(16, 8, 3, 0.56),
+    inset 0 0 0 1px var(--paper-edge);
+}
+
+.card {
+  border-radius: 16px;
+  box-shadow:
+    0 20px 46px rgba(16, 8, 3, 0.50),
+    inset 0 0 0 1px var(--paper-edge);
+}
+
+.card h3 {
+  font-size: 20px;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+.w-card h2 {
+  font-size: 24px;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+.w-date {
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: var(--ink-3);
+}
+
+.w-sub {
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.list li {
+  font-size: 15px;
+  color: var(--ink-2);
+  line-height: 1.62;
+}
+
+.sec-label {
+  color: var(--ink-3);
+}
+
+.ta {
+  border-top: 1px dashed var(--line);
+  font-size: 15.5px;
+  color: var(--ink);
+}
+
+.wish-row {
+  border-bottom: 1px dashed var(--line);
+}
+
+.wish-row input {
+  font-size: 16px;
+}
+
+.wish-row input::placeholder {
+  color: #B9A188;
+}
+
+.wish-row .del {
+  color: #B9A188;
+}
+
+.add {
+  color: #A96B38;
+  font-size: 14.5px;
+}
+
+.primary {
+  background: var(--ink);
+  color: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  font-size: 16px;
+}
+
+.w-skip {
+  color: var(--ink-3);
+  font-size: 14px;
+}
+
+.name-input {
+  border-bottom: 1.5px solid var(--line);
+  color: var(--ink);
+}
+
+.name-input::placeholder {
+  color: #B9A188;
+}
+
+/* --------------------------------------------------------------------------
+   7. 提示条：从“系统弹窗”变成“桌上便签”（bottom 没有动）
+   -------------------------------------------------------------------------- */
+#toast {
+  background: rgba(255, 246, 230, 0.94);
+  color: #43301F;
+  border-radius: 14px;
+  box-shadow:
+    0 16px 34px rgba(14, 7, 3, 0.50),
+    inset 0 0 0 1px rgba(206, 175, 133, 0.45);
+  font-size: 14.5px;
+  letter-spacing: 0.01em;
+}
+
+/* --------------------------------------------------------------------------
+   8. 台词气泡：压照片也读得清
+   -------------------------------------------------------------------------- */
+.bubble {
+  background: rgba(24, 16, 11, 0.80);
+  border: 1px solid rgba(252, 238, 212, 0.18);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 16px 36px rgba(8, 4, 2, 0.45);
+}
+
+/* --------------------------------------------------------------------------
+   9. 相纸：白边不再过曝，和卡片同色系
+   -------------------------------------------------------------------------- */
+.rope-photo {
+  box-shadow: 0 12px 22px rgba(14, 7, 3, 0.55);
+  /* 相纸白边原来是纯白，在夜里像一排灯箱，压一点并偏暖 */
+  filter: brightness(0.95) sepia(0.08) saturate(0.97);
+}
+
+.wp-face {
+  background: #FFF9EE;
+  box-shadow: 0 9px 18px rgba(14, 7, 3, 0.50);
+}
+
+.wp-cap {
+  font-size: 8.5px;
+  line-height: 1.18;
+  color: #6B5344;
+}
+
+.pe-img {
+  box-shadow: 0 12px 26px rgba(14, 7, 3, 0.40);
+}
+
+/* 照片带两端渐隐加宽：右侧 12% 渐出，提示“右边还有” */
+.rope-strip {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 4%, #000 88%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 4%, #000 88%, transparent 100%);
+}
+
+/* --------------------------------------------------------------------------
+   10. 开屏：礼物盒有“被光托着”的感觉
+   -------------------------------------------------------------------------- */
+#gate {
+  background:
+    radial-gradient(58% 38% at 50% 42%, rgba(255, 200, 140, 0.16), rgba(255, 200, 140, 0) 72%),
+    radial-gradient(120% 70% at 50% 38%, #34271F 0%, #150F0C 56%, #060403 100%);
+}
+
+.gate-hint {
+  font-size: 14.5px;
+  letter-spacing: 0.16em;
+  color: rgba(255, 240, 214, 0.78);
+  text-shadow: 0 1px 8px rgba(8, 4, 2, 0.8);
+}
+
+#phone {
+  background: #17120F;
+}
+
+/* 声音按钮：别让它隐到看不见 */
+#sound {
+  border: 1px solid rgba(252, 238, 212, 0.30);
+  background: rgba(252, 238, 212, 0.13);
+}
+
+/* 卡拉 OK 一样的细节：层里的“来源”小字提亮 */
+.bubble small {
+  color: rgba(255, 240, 214, 0.62);
+}
+
+.viewer-tip {
+  font-size: 12.5px;
+  color: rgba(255, 240, 214, 0.72);
+}
+
+.cv-hint {
+  font-size: 13.5px;
+  color: rgba(255, 240, 214, 0.76);
+}
+
+/* --------------------------------------------------------------------------
+   11. 冷色物件统一（相机/罐子/纸飞机是扁平矢量风，先把冷调压低）
+   -------------------------------------------------------------------------- */
+.obj-cam img.art {
+  filter:
+    saturate(0.86)
+    brightness(1.02)
+    drop-shadow(0 2px 3px rgba(38, 20, 10, 0.34))
+    drop-shadow(0 14px 22px rgba(24, 13, 6, 0.46));
+}
+
+.card-jar {
+  filter: saturate(0.82) brightness(1.03) drop-shadow(0 3px 6px rgba(48, 28, 14, 0.18));
+}
+
+/* --------------------------------------------------------------------------
+   12. 开场明暗（只调节强度，不碰 #phone.intro 的 thumbnail / 时序）
+   -------------------------------------------------------------------------- */
+.cake-spot {
+  background: radial-gradient(closest-side, rgba(255, 190, 110, 0.58), rgba(255, 190, 110, 0) 74%);
+}
+
+.home-flame {
+  filter: drop-shadow(0 0 14px rgba(255, 170, 80, 0.85));
+}
+
+/* --------------------------------------------------------------------------
+   12.5 经你确认的两处尺寸微调（贴近但未改变布局结构）
+   —— cake 层人物原来 30% / 最大 132px，在 430 屏上只有 132px 宽，和蛋糕没有对手戏。
+      放大到 34% / 160px，并用负 margin 找回被占掉的高度，避免层内容溢出。
+   -------------------------------------------------------------------------- */
+.act-ch {
+  width: 34%;
+  max-width: 160px;
+  margin-bottom: -10px;
+}
+
+/* --------------------------------------------------------------------------
+   13. 小屏（360 / 380 以下）回退字号，避免标签挤在一起
+   -------------------------------------------------------------------------- */
+@media (max-width: 380px) {
+  .obj-name {
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+  }
+
+  .obj-cake .obj-name {
+    font-size: 10.5px;
+  }
+
+  .tip {
+    font-size: 20px;
+  }
+
+  .w-card h2 {
+    font-size: 22px;
+  }
+
+  .card h3 {
+    font-size: 19px;
+  }
+
+  .act-ch {
+    width: 32%;
+    max-width: 148px;
+  }
+}
+
+/* ==========================================================================
+   14. 大图查看：弧形旋转按钮 + 照片背面
+   --------------------------------------------------------------------------
+   结构由 app.js 运行时挂载（index.html 一行未改），这里只负责长相。
+   -------------------------------------------------------------------------- */
+
+.v-flip-btn {
+  position: absolute;
+  z-index: 6;
+  right: 12px;
+  top: 16vh;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #F6C74A;
+  cursor: pointer;
+  /* 手绘小星星：黄色蜡笔色 + 深棕勾边。两层投影让它在亮照片和暗照片上都立得住 */
+  filter:
+    drop-shadow(0 0 2px rgba(255, 249, 238, 0.95))
+    drop-shadow(0 1px 3px rgba(0, 0, 0, 0.48));
+  transform: perspective(320px) rotateY(0deg);
+  transition: transform 0.5s cubic-bezier(0.34, 1.26, 0.52, 1), opacity 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.v-flip-btn svg {
+  display: block;
+  width: 34px;
+  height: 34px;
+}
+
+.v-flip-btn:active {
+  transform: perspective(320px) rotateY(0deg) scale(0.86);
+}
+
+/* 点一下：星星自己绕竖轴翻过去，和照片翻面是同一个节拍 */
+.viewer.show-back .v-flip-btn {
+  transform: perspective(320px) rotateY(180deg);
+}
+
+.viewer.show-back .v-flip-btn:active {
+  transform: perspective(320px) rotateY(180deg) scale(0.86);
+}
+
+/* 背面：一张空白的纸，位置和大小由 JS 贴到照片本身（不留横线、不缩水） */
+.v-back {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 5;
+  width: min(72%, 292px);
+  aspect-ratio: 620 / 740;
+  padding: 30px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background:
+    radial-gradient(120% 100% at 24% 4%, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0) 64%),
+    radial-gradient(140% 118% at 18% 8%, #FFFBF2 0%, #F8EEE0 56%, #EADCC6 100%);
+  box-shadow:
+    0 30px 68px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(176, 144, 112, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  /* --vb-dx/--vb-dy 由 JS 归零：那时 left/top 已经直接给了像素值，不再需要居中偏移 */
+  transform: translate(var(--vb-dx, -50%), var(--vb-dy, -50%)) rotateY(-82deg) scale(0.94);
+  opacity: 0;
+  visibility: hidden;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.5s cubic-bezier(0.22, 0.9, 0.28, 1),
+    opacity 0.28s ease,
+    visibility 0.5s;
+}
+
+.viewer.show-back .v-back {
+  transform: translate(var(--vb-dx, -50%), var(--vb-dy, -50%)) rotateY(0deg) scale(1);
+  opacity: 1;
+  visibility: visible;
+}
+
+/* 正片让位：只淡出，不缩放——背面必须和原来的照片一样大、一样高 */
+.viewer #viewerImg {
+  transition: opacity 0.3s ease;
+}
+
+.viewer.show-back #viewerImg {
+  opacity: 0;
+}
+
+/* 背面文字：手写体、行距松，长备注内部可滑但不出滚动条 */
+.v-back-note {
+  margin: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  font-family: "CC Hand", "STKaiti", "KaiTi", "Songti SC", serif;
+  font-size: 16px;
+  line-height: 1.94;
+  letter-spacing: 0.02em;
+  color: #5A4436;
+  text-align: center;
+  white-space: pre-wrap;
+  word-break: break-word;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.v-back-note::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* ==========================================================================
+   15. 祝福卡：按作者要求恢复原版（不做歪纸与额外投影）
+   --------------------------------------------------------------------------
+   屏幕上的 #cardimg 样式回到 style.css 的第 550 行，此处不再覆盖。
+   -------------------------------------------------------------------------- */
+
+
+
+/* ==========================================================================
+   16. 小猫取名弹层：w-card 是奶油纸底，全局 .mini 的奶油字几乎看不见，加深
+   ========================================================================== */
+#catname .mini {
+  border-color: var(--ink);
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.5);
+}
+#catname .mini.ghost {
+  border-color: #C9B49A;
+  color: var(--ink-2);
+  background: transparent;
+}

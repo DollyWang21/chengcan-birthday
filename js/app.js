@@ -1012,7 +1012,7 @@
               </svg>
             </div>
           </div>
-          <p class="sub" id="cakeSub">${navigator.mediaDevices && window.isSecureContext ? "对着它吹一口气，或者点一下蜡烛" : "点一下蜡烛，就能吹灭"}</p>
+          <p class="sub" id="cakeSub">点一下蜡烛，就能吹灭</p>
           <button class="mini" id="cakeWish" hidden>看看愿望</button>
           <button class="mini" id="cakeRecord" hidden>存一张今天的记录</button>`;
       },
@@ -1071,8 +1071,6 @@
           sub.textContent = "愿你所愿皆所成。";
           wishBtn.hidden = false;
           done = true;
-        } else if (navigator.mediaDevices && window.isSecureContext) {
-          listenBreath(out);
         }
       }
     },
@@ -1625,42 +1623,6 @@
     });
     setTimeout(() => { Sound.meow(); cat.src = "assets/arts/cat-14.webp"; }, 640);
     setTimeout(() => { card.remove(); setTimeout(() => { cat.src = "assets/arts/cat-31.webp"; }, 900); }, 950);
-  }
-
-  /* ---------------- 麦克风吹气 ---------------- */
-  function listenBreath(onBlow) {
-    let stream = null, ac = null, raf = 0;
-    const stop = () => {
-      cancelAnimationFrame(raf);
-      if (stream) stream.getTracks().forEach((t) => t.stop());
-      if (ac) { try { ac.close(); } catch (e) {} }
-    };
-    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } })
-      .then((s) => {
-        stream = s;
-        const AC = window.AudioContext || window.webkitAudioContext;
-        ac = new AC();
-        const src = ac.createMediaStreamSource(s);
-        const an = ac.createAnalyser();
-        an.fftSize = 1024;
-        src.connect(an);
-        const buf = new Float32Array(an.fftSize);
-        let calm = 0;
-        const readyAt = Date.now(); // grace period: let the hint sink in before reacting
-        const tick = () => {
-          if (Date.now() - readyAt < 800) { raf = requestAnimationFrame(tick); return; }
-          an.getFloatTimeDomainData(buf);
-          let sum = 0;
-          for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
-          const rms = Math.sqrt(sum / buf.length);
-          if (rms > 0.06) { calm += 1; if (calm > 2) { stop(); onBlow(); return; } }
-          else calm = 0;
-          raf = requestAnimationFrame(tick);
-        };
-        tick();
-      })
-      .catch(() => {});
-    setTimeout(stop, 30000);
   }
 
   /* ---------------- 结尾卡 ---------------- */

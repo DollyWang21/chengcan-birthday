@@ -1793,6 +1793,8 @@ function hideCard() {
   function playIntro(done) {
     if (!homeFlame || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       if (homeFlame) homeFlame.classList.add("on");
+      const ph = $("#phone");
+      if (ph) ph.classList.remove("intro");
       if (done) done();
       return;
     }
@@ -1856,6 +1858,8 @@ function hideCard() {
     if (!gateEl) return false;
     if (skipGate) {
       gateEl.hidden = true;
+      const ph = $("#phone");
+      if (ph) ph.classList.remove("intro");
       if (homeFlame) homeFlame.classList.add("on");
       return false;
     }
@@ -1887,15 +1891,26 @@ function hideCard() {
   const veil = $("#veil");
   if (location.search.includes("static")) {
     if (veil) veil.remove();
-  } else {
-    const drop = () => {
-      if (!veil || veil._done) return;
-      veil._done = true;
-      setTimeout(() => { veil.classList.add("off"); setTimeout(() => veil.remove(), 800); }, 160);
-    };
-    if (document.readyState === "complete") drop();
-    else window.addEventListener("load", drop, { once: true });
-    setTimeout(drop, 2600);
+  } else if (veil) {
+    const veilOpacity = parseFloat(getComputedStyle(veil).opacity);
+    if (veilOpacity === 0) {
+      // CSS 兜底已淡出完毕，直接移除，避免撤销动画时又闪回来
+      veil.remove();
+    } else if (veilOpacity < 1) {
+      // 兜底动画正在退场，让它自己走完
+      veil.addEventListener("animationend", () => veil.remove(), { once: true });
+    } else {
+      // JS 已就位：撤掉 CSS 兜底，沿用原来的「加载完即退场」快路径
+      veil.classList.add("js-ready");
+      const drop = () => {
+        if (!veil || veil._done) return;
+        veil._done = true;
+        setTimeout(() => { veil.classList.add("off"); setTimeout(() => veil.remove(), 800); }, 160);
+      };
+      if (document.readyState === "complete") drop();
+      else window.addEventListener("load", drop, { once: true });
+      setTimeout(drop, 2600);
+    }
   }
 
   const gateOn = startGate();

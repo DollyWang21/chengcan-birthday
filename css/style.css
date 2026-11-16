@@ -592,6 +592,9 @@ body { display: block; }
   transition: opacity .7s ease;
 }
 #veil.off { opacity: 0; pointer-events: none; }
+/* 首屏兜底：app.js 尚未执行完时也能自行退场，不再让烛光卡住首屏 */
+#veil:not(.js-ready) { animation: veilAutoFade .7s ease 2.6s forwards; }
+@keyframes veilAutoFade { to { opacity: 0; visibility: hidden; pointer-events: none; } }
 .veil-flame {
   width: 12px; height: 20px;
   border-radius: 50% 50% 45% 45% / 70% 70% 30% 30%;

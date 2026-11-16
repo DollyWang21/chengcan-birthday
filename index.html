@@ -19,23 +19,11 @@
 <link rel="preload" as="image" href="assets/arts/ch-23.webp">
 <link rel="stylesheet" href="css/style.css?v=20261116b">
 <link rel="stylesheet" href="css/theme.css?v=20261115a">
-<style>
-  /* 纯 CSS 兜底：遮罩最晚 2.4s 自动淡出，完全不依赖 app.js，避免首次加载慢时卡在烛光页 */
-  #veil { animation: veilAutoFade .6s ease 2.4s forwards; }
-  @keyframes veilAutoFade { to { opacity: 0; pointer-events: none; visibility: hidden; } }
-</style>
 </head>
 <body>
 <div id="phone">
 
   <div id="veil" aria-hidden="true"><i class="veil-flame"></i></div>
-  <script>
-    // 兜底计时器内联在 HTML 里，不依赖 app.js 下载：首次进站即使脚本加载慢，遮罩也会按时淡出。
-    setTimeout(function () {
-      var v = document.getElementById("veil");
-      if (v && !v._done) { v._done = true; v.classList.add("off"); }
-    }, 2600);
-  </script>
 
   <div class="room" aria-hidden="true">
     <img class="window-art" id="windowArt" src="assets/arts/prop-window.webp" alt="窗" role="button" tabindex="0">

@@ -116,9 +116,9 @@ window.Sound = (function () {
 
   /* ---------- 背景音与八音盒：用真实录音 ---------- */
   const amb = typeof Audio !== "undefined" ? new Audio("assets/audio/ambient.mp3") : null;
-  if (amb) { amb.loop = true; amb.preload = "auto"; amb.volume = 0; }
+  if (amb) { amb.loop = true; amb.preload = "metadata"; amb.volume = 0; }
   const box = typeof Audio !== "undefined" ? new Audio("assets/audio/birthday-box.mp3") : null;
-  if (box) { box.preload = "auto"; box.volume = 0.9; }
+  if (box) { box.preload = "metadata"; box.volume = 0.9; }
   let ambFade = null;
 
   function fadeAmb(to, ms) {
@@ -436,7 +436,11 @@ window.Sound = (function () {
   };
 
   // 页面加载就开始解码，等第一次交互时已经就绪（此时音频上下文还是挂起的）
-  if (typeof window !== "undefined") setTimeout(preload, 300);
+  if (typeof window !== "undefined") {
+    const warm = () => setTimeout(preload, 1200);
+    if (document.readyState === "complete") warm();
+    else window.addEventListener("load", warm, { once: true });
+  }
 
   return api;
 })();

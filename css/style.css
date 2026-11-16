@@ -586,7 +586,7 @@ body { display: block; }
 /* 遮罩 */
 #veil {
   position: absolute; inset: 0;
-  z-index: 70;
+  z-index: 95;
   display: grid; place-items: center;
   background: radial-gradient(120% 60% at 50% 30%, #3A2C25, #1B1512 70%);
   transition: opacity .7s ease;

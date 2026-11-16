@@ -1063,7 +1063,7 @@
             toast("你可以许个愿望了。", 4200);
             try { Sound.birthdayBox(); } catch (e) {}
           }, 320);
-          setTimeout(() => openWishSheet(false, "现在可以闭上眼睛，许个愿了。"), 1500);
+          setTimeout(() => openWishSheet(false, "现在可以闭上眼睛，许个愿了。"), 2000);
         }
         if (data.candle) {
           flame.style.opacity = "0";
@@ -1653,7 +1653,7 @@
           let sum = 0;
           for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
           const rms = Math.sqrt(sum / buf.length);
-          if (rms > 0.12) { calm += 1; if (calm > 7) { stop(); onBlow(); return; } }
+          if (rms > 0.09) { calm += 1; if (calm > 4) { stop(); onBlow(); return; } }
           else calm = 0;
           raf = requestAnimationFrame(tick);
         };

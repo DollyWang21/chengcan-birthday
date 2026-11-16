@@ -1628,49 +1628,59 @@
   }
 
   /* ---------------- 麦克风吹气 ---------------- */
-  // Ask for mic permission on entry, so the browser prompt appears before the
-  // candle scene instead of covering it. Granted permission sticks for this origin.
-  let micPrimeTried = false;
+  // Get the mic stream on entry and keep it for the whole visit, so the browser
+  // permission prompt never shows up over the candle scene. Mobile browsers may
+  // reject getUserMedia without a gesture, so retry on the first tap as fallback.
+  let micStream = null, micPending = false;
+  function onFirstTap() { primeMic(); }
   function primeMic() {
-    if (micPrimeTried || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
-    micPrimeTried = true;
+    if (micStream || micPending || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    micPending = true;
     navigator.mediaDevices.getUserMedia({ audio: true })
-      .then((s) => { s.getTracks().forEach((t) => t.stop()); })
-      .catch(() => {});
+      .then((s) => {
+        micPending = false;
+        micStream = s;
+        document.removeEventListener("pointerdown", onFirstTap, true);
+      })
+      .catch(() => { micPending = false; });
   }
+  document.addEventListener("pointerdown", onFirstTap, true);
 
   function listenBreath(onBlow) {
-    let stream = null, ac = null, raf = 0;
+    let ac = null, raf = 0;
     const stop = () => {
       cancelAnimationFrame(raf);
-      if (stream) stream.getTracks().forEach((t) => t.stop());
       if (ac) { try { ac.close(); } catch (e) {} }
     };
-    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } })
-      .then((s) => {
-        stream = s;
-        const AC = window.AudioContext || window.webkitAudioContext;
-        ac = new AC();
-        const src = ac.createMediaStreamSource(s);
-        const an = ac.createAnalyser();
-        an.fftSize = 1024;
-        src.connect(an);
-        const buf = new Float32Array(an.fftSize);
-        let calm = 0;
-        const readyAt = Date.now(); // grace period: let the hint sink in before reacting
-        const tick = () => {
-          if (Date.now() - readyAt < 800) { raf = requestAnimationFrame(tick); return; }
-          an.getFloatTimeDomainData(buf);
-          let sum = 0;
-          for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
-          const rms = Math.sqrt(sum / buf.length);
-          if (rms > 0.08) { calm += 1; if (calm > 4) { stop(); onBlow(); return; } }
-          else calm = 0;
-          raf = requestAnimationFrame(tick);
-        };
-        tick();
-      })
-      .catch(() => {});
+    const watch = (s) => {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      ac = new AC();
+      const src = ac.createMediaStreamSource(s);
+      const an = ac.createAnalyser();
+      an.fftSize = 1024;
+      src.connect(an);
+      const buf = new Float32Array(an.fftSize);
+      let calm = 0;
+      const readyAt = Date.now(); // grace period: let the hint sink in before reacting
+      const tick = () => {
+        if (Date.now() - readyAt < 800) { raf = requestAnimationFrame(tick); return; }
+        an.getFloatTimeDomainData(buf);
+        let sum = 0;
+        for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+        const rms = Math.sqrt(sum / buf.length);
+        if (rms > 0.06) { calm += 1; if (calm > 2) { stop(); onBlow(); return; } }
+        else calm = 0;
+        raf = requestAnimationFrame(tick);
+      };
+      tick();
+    };
+    if (micStream && micStream.getAudioTracks().some((t) => t.readyState === "live")) {
+      watch(micStream);
+    } else {
+      navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } })
+        .then((s) => { micStream = s; watch(s); })
+        .catch(() => {});
+    }
     setTimeout(stop, 30000);
   }
 

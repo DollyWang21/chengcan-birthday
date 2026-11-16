@@ -1628,6 +1628,17 @@
   }
 
   /* ---------------- 麦克风吹气 ---------------- */
+  // Ask for mic permission on entry, so the browser prompt appears before the
+  // candle scene instead of covering it. Granted permission sticks for this origin.
+  let micPrimeTried = false;
+  function primeMic() {
+    if (micPrimeTried || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    micPrimeTried = true;
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then((s) => { s.getTracks().forEach((t) => t.stop()); })
+      .catch(() => {});
+  }
+
   function listenBreath(onBlow) {
     let stream = null, ac = null, raf = 0;
     const stop = () => {
@@ -1653,7 +1664,7 @@
           let sum = 0;
           for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
           const rms = Math.sqrt(sum / buf.length);
-          if (rms > 0.09) { calm += 1; if (calm > 4) { stop(); onBlow(); return; } }
+          if (rms > 0.08) { calm += 1; if (calm > 4) { stop(); onBlow(); return; } }
           else calm = 0;
           raf = requestAnimationFrame(tick);
         };
@@ -1921,6 +1932,7 @@ function hideCard() {
   /* ---------------- 启动 ---------------- */
   syncSound();
   buildRope();
+  primeMic();
 
   const veil = $("#veil");
   if (location.search.includes("static")) {

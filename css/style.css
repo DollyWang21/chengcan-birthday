@@ -1149,6 +1149,7 @@ body { display: block; }
 }
 
 .gate-hint {
+  font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
   font-size: 14px;
   letter-spacing: .18em;
   color: rgba(246,231,200,.55);

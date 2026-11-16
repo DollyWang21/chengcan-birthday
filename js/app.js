@@ -1646,12 +1646,14 @@
         src.connect(an);
         const buf = new Float32Array(an.fftSize);
         let calm = 0;
+        const readyAt = Date.now(); // grace period: let the hint sink in before reacting
         const tick = () => {
+          if (Date.now() - readyAt < 2200) { raf = requestAnimationFrame(tick); return; }
           an.getFloatTimeDomainData(buf);
           let sum = 0;
           for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
           const rms = Math.sqrt(sum / buf.length);
-          if (rms > 0.05) { calm += 1; if (calm > 2) { stop(); onBlow(); return; } }
+          if (rms > 0.12) { calm += 1; if (calm > 7) { stop(); onBlow(); return; } }
           else calm = 0;
           raf = requestAnimationFrame(tick);
         };
@@ -1800,12 +1802,12 @@ function hideCard() {
     if (e.target.id === "cardview") { hideCard(); }
   });
   /* ---------------- 开屏：礼物盒 ---------------- */
-  const UNLOCK_AT = new Date(2026, 10, 16, 17, 30, 0).getTime();
+  const UNLOCK_AT = new Date(2026, 10, 16, 18, 0, 0).getTime();
   const qsAll = location.search;
   const skipGate = qsAll.includes("static");
   const forceUnlock = qsAll.includes("unlock");
   const forceLock = qsAll.includes("lock=1");
-  const unlocked = forceUnlock || (!forceLock && Date.now() >= UNLOCK_AT);
+  let unlocked = forceUnlock || (!forceLock && Date.now() >= UNLOCK_AT);
 
   const gateEl = $("#gate");
   const giftEl = $("#gift");
@@ -1872,7 +1874,7 @@ function hideCard() {
       Sound.unlock();
       if (!gateEl || gateEl.hidden) return;
       if (!unlocked) {
-        toast("礼物将会在 11 月 16 号 17:30 准时送达。", 3800);
+        toast("礼物将会在 11 月 16 号 18:00 准时送达。", 3800);
         Sound.gift();
         giftEl.classList.remove("shake");
         void giftEl.offsetWidth;
@@ -1899,8 +1901,21 @@ function hideCard() {
     // 开屏期间就让里面保持全暗，淡出时不会先亮一下
     const ph = $("#phone");
     if (ph) ph.classList.add("intro");
-    if (gateHint) gateHint.textContent = unlocked ? "连点三下，打开礼物" : "礼物将会在 11 月 16 号 17:30 准时送达";
+    if (gateHint) gateHint.textContent = unlocked ? "连点三下，打开礼物" : "礼物将会在 11 月 16 号 18:00 准时送达";
     return true;
+  }
+
+  // Keep checking the clock while the page stays open, so the gate flips at unlock time without a reload.
+  function syncUnlock() {
+    if (unlocked || forceLock || !gateEl || gateEl.hidden) return;
+    const left = UNLOCK_AT - Date.now();
+    if (left > 0) {
+      setTimeout(syncUnlock, Math.min(left + 30, 1000));
+      return;
+    }
+    unlocked = true;
+    if (gateHint) gateHint.textContent = "连点三下，打开礼物";
+    toast("礼物送达了，连点三下打开吧。", 5200);
   }
 
   /* ---------------- 启动 ---------------- */
@@ -1922,6 +1937,7 @@ function hideCard() {
   }
 
   const gateOn = startGate();
+  if (gateOn) syncUnlock();
   if (!gateOn) {
     if (!location.search.includes("nowelcome")) {
       setTimeout(() => afterIntro(), 300);

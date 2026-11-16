@@ -1800,7 +1800,7 @@ function hideCard() {
     if (e.target.id === "cardview") { hideCard(); }
   });
   /* ---------------- 开屏：礼物盒 ---------------- */
-  const UNLOCK_AT = new Date(2026, 10, 17, 0, 0, 0).getTime();
+  const UNLOCK_AT = new Date(2026, 10, 16, 17, 30, 0).getTime();
   const qsAll = location.search;
   const skipGate = qsAll.includes("static");
   const forceUnlock = qsAll.includes("unlock");
@@ -1872,7 +1872,7 @@ function hideCard() {
       Sound.unlock();
       if (!gateEl || gateEl.hidden) return;
       if (!unlocked) {
-        toast("礼物将会在 11 月 17 号 00:00 准时送达。", 3800);
+        toast("礼物将会在 11 月 16 号 17:30 准时送达。", 3800);
         Sound.gift();
         giftEl.classList.remove("shake");
         void giftEl.offsetWidth;
@@ -1899,7 +1899,7 @@ function hideCard() {
     // 开屏期间就让里面保持全暗，淡出时不会先亮一下
     const ph = $("#phone");
     if (ph) ph.classList.add("intro");
-    if (gateHint) gateHint.textContent = unlocked ? "连点三下，打开礼物" : "礼物将会在 11 月 17 号 00:00 准时送达";
+    if (gateHint) gateHint.textContent = unlocked ? "连点三下，打开礼物" : "礼物将会在 11 月 16 号 17:30 准时送达";
     return true;
   }
 

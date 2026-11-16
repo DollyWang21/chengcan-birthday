@@ -1648,7 +1648,7 @@
         let calm = 0;
         const readyAt = Date.now(); // grace period: let the hint sink in before reacting
         const tick = () => {
-          if (Date.now() - readyAt < 2200) { raf = requestAnimationFrame(tick); return; }
+          if (Date.now() - readyAt < 800) { raf = requestAnimationFrame(tick); return; }
           an.getFloatTimeDomainData(buf);
           let sum = 0;
           for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
